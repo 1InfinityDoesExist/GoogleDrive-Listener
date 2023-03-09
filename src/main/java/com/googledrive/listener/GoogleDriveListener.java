@@ -43,6 +43,8 @@ import lombok.extern.slf4j.Slf4j;
  * 
  * https://developers.google.com/admin-sdk/reports/v1/guides/push
  * 
+ * https://developers.google.com/drive/api/v2/reference/changes
+ * 
  * @author gaian
  *
  */
@@ -74,7 +76,7 @@ public class GoogleDriveListener {
 
 		Watch action;
 		try {
-			action = service.changes().watch("xx-OhCaej", channel);
+			action = service.changes().watch("161OSzYocfc4c0YoESLTOwhJ85-OhCaej", channel);
 			System.out.println(action.execute().toPrettyString());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
