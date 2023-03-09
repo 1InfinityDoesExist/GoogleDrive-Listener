@@ -18,14 +18,19 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
+import com.google.api.client.googleapis.json.GoogleJsonResponseException;
+import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.gax.core.CredentialsProvider;
 import com.google.api.gax.core.FixedCredentialsProvider;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.Drive.Changes.Watch;
+import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.Channel;
+import com.google.auth.http.HttpCredentialsAdapter;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.auth.oauth2.ServiceAccountCredentials;
 import com.googledrive.util.GenericRestCalls;
@@ -57,17 +62,19 @@ public class GoogleDriveListener {
 
 		GoogleCredential driveService = getGoogleCredential(filePath);
 
+		// createFolder(driveService);
+
 		Drive service = new Drive.Builder(new NetHttpTransport(), new JacksonFactory(), driveService).build();
 
 		Channel channel = new Channel();
 		channel.setAddress(
-				"xxx");
+				"https://ingress-gateway.gaiansolutions.com/utility-service/social-engagement/g-drive/events");
 		channel.setType("web_hook");
 		channel.setId(UUID.randomUUID().toString());
 
 		Watch action;
 		try {
-			action = service.changes().watch("xxx-OhCaej", channel);
+			action = service.changes().watch("xx-OhCaej", channel);
 			System.out.println(action.execute().toPrettyString());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -105,6 +112,24 @@ public class GoogleDriveListener {
 				.create(ServiceAccountCredentials.fromStream(new FileInputStream(filePath)));
 		log.info("-----CredentialsProvider : {}", credentialsProvider);
 		return credentialsProvider;
+	}
+
+	public String createFolder(GoogleCredential driveService) throws IOException {
+		Drive service = new Drive.Builder(new NetHttpTransport(), GsonFactory.getDefaultInstance(), driveService)
+				.setApplicationName("Drive samples").build();
+
+		com.google.api.services.drive.model.File fileMetadata = new com.google.api.services.drive.model.File();
+		fileMetadata.setName("Test");
+		fileMetadata.setMimeType("application/vnd.google-apps.folder");
+		try {
+			com.google.api.services.drive.model.File file = service.files().create(fileMetadata).setFields("id")
+					.execute();
+			System.out.println("Folder ID: " + file.getId());
+			return file.getId();
+		} catch (GoogleJsonResponseException e) {
+			System.err.println("Unable to create folder: " + e.getDetails());
+			throw e;
+		}
 	}
 
 }
