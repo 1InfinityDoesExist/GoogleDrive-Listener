@@ -76,7 +76,7 @@ public class GoogleDriveListener {
 
 		Watch action;
 		try {
-			action = service.changes().watch("161OSzYocfc4c0YoESLTOwhJ85-OhCaej", channel);
+			action = service.changes().watch("xxx-OhCaej", channel);
 			System.out.println(action.execute().toPrettyString());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
